@@ -36,13 +36,13 @@ Par.display = true;
 
 % Par.method = 'WNNM_ADMM'
 Par.method = ' DWNNM_ADMM'
-Par.maxIter = 10;
+Par.maxIter = 10;  %ADMM分解迭代次数
 
 %Par.model = '2';      模式选择删除
 
 Par.delta     =   0.1;                                  % Parameter between each iter
-%未搞懂
-Par.lambda = 0.75;         %for different noise levels, this parameter should be tuned to achieve better performance
+%未搞懂   迭代过程中削减噪声强度
+Par.lambda = 0.75;         %for different noise levels, this parameter should be tuned to achieve  better performance
 Par.mu = 1.001;       %更新参数 rho
 Par.rho = 0.05;       %惩罚系数
 % record all the results in each iteration
