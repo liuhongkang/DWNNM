@@ -56,9 +56,11 @@ for i = 1:im_num
     S = regexp(im_dir(i).name, '\.', 'split');   %暂时无用
     [h, w, ch] = size(Par.I);     %图像尺寸和通道数
     Par.nim = zeros(size(Par.I));
+    Par.weight=zeros(size(Par.I));   %add weight metrix
     for c = 1:ch
         randn('seed',0);
         Par.nim(:, :, c) = Par.I(:, :, c) + Par.nSig0(c) * randn(size(Par.I(:, :, c))); %每个通道添加不同的噪声强度
+        Par.weight(:,:,c)=local_structure_weight(Par.nim(:, :, c),'Gaussian',3);
     end
     fprintf('%s :\n',im_dir(i).name);
     PSNR =   csnr( Par.nim, Par.I, 0, 0 );
@@ -66,7 +68,7 @@ for i = 1:im_num
     fprintf('The initial value of PSNR = %2.4f, SSIM = %2.4f \n', PSNR,SSIM);
     %
     time0 = clock;
-    [im_out, Par] = DWNNM_ADMM_Denoising( Par.nim, Par.I, Par );%采用唯一的去噪模式
+    [im_out, Par] = DWNNM_ADMM_Denoising( Par.nim, Par.I,Par.weight, Par );%采用唯一的去噪模式
     fprintf('Total elapsed time = %f s\n', (etime(clock,time0)) );   %记录去噪过程消耗时间
     %结果修正
     im_out(im_out>255)=255;

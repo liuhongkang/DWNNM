@@ -1,4 +1,4 @@
-function [E_Img, Par]   =  MCWNNM_ADMM2_Denoising( N_Img, O_Img, Par )
+function [E_Img, Par]   =  MCWNNM_ADMM2_Denoising( N_Img, O_Img,W_Img, Par )
 E_Img           = N_Img;   % Estimated Image
 [h, w, ch]  = size(E_Img);
 Par.h = h;
@@ -7,6 +7,7 @@ Par.ch = ch;
 Par = SearchNeighborIndex( Par ); %寻找最近邻索引，包括所有关键块的自身索引，可搜索的所有图像块的数量，可搜索的所有图像块的索引序列
 % noisy image to patch
 NoiPat =	Image2Patch( N_Img, Par );  %划分图像块，每块包含三个通道
+WeiPat=Image2Patch(W_Img,Par);  % add对于权重图像划分图像块，也对应其通道数
 Par.TolN = size(NoiPat, 2);   %列数，即总的图像块数量
 Sigma_arrCh = zeros(Par.ch*Par.ps2, Par.TolN);
 for iter = 1 : Par.Iter
@@ -31,7 +32,7 @@ for iter = 1 : Par.Iter
         NL_mat  =  Block_Matching(CurPat, Par);% Caculate Non-local similar patches for each
     end
     % Denoising by DWNNM
-    [Y_hat, W_hat]  =  DWNNM_ADMM_Estimation( NL_mat, Sigma_arrCh, CurPat, Par );   % Estimate all the patches
+    [Y_hat, W_hat]  =  DWNNM_ADMM_Estimation( NL_mat, Sigma_arrCh, CurPat,WeiPat, Par );   % Estimate all the patches
     E_Img = PGs2Image(Y_hat, W_hat, Par);
     PSNR  = csnr( O_Img, E_Img, 0, 0 );
     SSIM      =  cal_ssim( O_Img, E_Img, 0, 0 );
