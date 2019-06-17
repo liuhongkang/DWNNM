@@ -1,23 +1,7 @@
-%-------------------------------------------------------------------------------------------------------------
-% This is an implementation of the MCWNNM algorithm for real color image denoising.
-% Author:  Jun Xu, csjunxu@comp.polyu.edu.hk
-%              The Hong Kong Polytechnic University
-%
-% Please refer to the following paper if you use this code:
-%
-% @article{MCWNNM,
-% 	author = {Jun Xu and Lei Zhang and David Zhang and Xiangchu Feng},
-% 	title = {Multi-channel Weighted Nuclear Norm Minimization for Real Color Image Denoising},
-% 	journal = {ICCV},
-% 	year = {2017}
-% }
-%
-% This is not the final version of MCWNNM, please do not distribute.
-% Please see the file License.txt for the license governing this code.
-%-------------------------------------------------------------------------------------------------------------
 
 clear;
-Original_image_dir  =    ' infrared_image/';
+Original_image_dir  =    'clean_images/';
+Denoising_image_dir='denoising_images/';
 fpath = fullfile(Original_image_dir, '*clean.png');
 im_dir  = dir(fpath);
 im_num = length(im_dir);
@@ -60,7 +44,7 @@ for i = 1:im_num
     for c = 1:ch
         randn('seed',0);
         Par.nim(:, :, c) = Par.I(:, :, c) + Par.nSig0(c) * randn(size(Par.I(:, :, c))); %每个通道添加不同的噪声强度
-        Par.weight(:,:,c)=local_structure_weight(Par.nim(:, :, c),'Gaussian',3);
+        Par.weight(:,:,c)=local_structure_weight(Par.nim(:, :, c),'Gaussian',Par.nSig0(c));
     end
     fprintf('%s :\n',im_dir(i).name);
     PSNR =   csnr( Par.nim, Par.I, 0, 0 );
@@ -78,7 +62,7 @@ for i = 1:im_num
     Par.PSNR(Par.Iter, Par.image)  =   csnr( im_out, Par.I, 0, 0 );
     Par.SSIM(Par.Iter, Par.image)      =  cal_ssim( im_out, Par.I, 0, 0 );
     imname = sprintf([Par.method '_nSig' num2str(nSig(1)) num2str(nSig(2)) num2str(nSig(3)) '_Oite' num2str(Par.Iter) '_Iite' num2str(Par.maxIter) '_rho' num2str(rho) '_mu' num2str(mu) '_lambda' num2str(lambda) '_' im_dir(i).name]);
-    imwrite(im_out/255, imname);
+    imwrite(im_out/255, [Denoising_image_dir,imname]);
     fprintf('%s : PSNR = %2.4f, SSIM = %2.4f \n',im_dir(i).name, Par.PSNR(Par.Iter, Par.image),Par.SSIM(Par.Iter, Par.image)     );
 end
 mPSNR=mean(Par.PSNR,2);    %计算所有图像 PSNR 均值，形成列向量

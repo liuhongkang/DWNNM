@@ -13,7 +13,7 @@ Sigma_arrCh = zeros(Par.ch*Par.ps2, Par.TolN);
 for iter = 1 : Par.Iter
     Par.iter = iter;
     % iterative regularization
-    E_Img =	E_Img + Par.delta * (N_Img - E_Img);
+    E_Img =	E_Img + Par.delta * (N_Img - E_Img);% 这个地方真的搞不懂
     % image to patch
     CurPat =	Image2Patch( E_Img, Par );
     % estimate local noise variance
