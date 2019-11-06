@@ -1,8 +1,9 @@
-function [struct_weight] = local_structure_weight(img, filter_type, pat_wid)
-%计算局部结构先验，进而得出与图像尺寸相同的权重矩阵
-%filter_type 表示滤波种类，pat_wid表示模糊核尺寸
+function [struct_weight] = local_structure_weight(img, filter_type, sigma)
+%计算�?部结构先验，进�?�得出与图像尺寸相同的权重矩�?
+%filter_type 表示滤波种类，pat_wid表示模糊核尺�?
     [img_hei, img_wid] = size(img);
-    G = fspecial('gaussian', [pat_wid pat_wid], 1.2); % Gaussian kernel
+    pat_wid=3;%% 卷积核尺�?
+    G = fspecial('gaussian', [pat_wid pat_wid], sigma); % Gaussian kernel
     u = imfilter(img, G, 'symmetric');
     % u = img;
     [Gx, Gy] = gradient(u);
@@ -22,6 +23,6 @@ function [struct_weight] = local_structure_weight(img, filter_type, pat_wid)
     end
     
     sqrt_delta = sqrt((J_rho(:,:,1,1) - J_rho(:,:,2,2)).^2 + 4*J_rho(:,:,1,2).^2);
-    lambda_1 = 0.5*(J_rho(:,:,1,1) + J_rho(:,:,2,2) + sqrt_delta);
-    lambda_2 = 0.5*(J_rho(:,:,1,1) + J_rho(:,:,2,2) - sqrt_delta);
-    struct_weight = exp(h * mat2gray(lambda1 - lambda2));
+    lambda1 = 0.5*(J_rho(:,:,1,1) + J_rho(:,:,2,2) + sqrt_delta);
+    lambda2 = 0.5*(J_rho(:,:,1,1) + J_rho(:,:,2,2) - sqrt_delta);
+    struct_weight = (mat2gray(lambda1 - lambda2)).^3;%%此处�?要调整，得到归一化的权重

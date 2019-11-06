@@ -7,23 +7,23 @@ function  par  =  SearchNeighborIndex(par)
 % -SelfIndex is the index of keypatches in the total patch index array
 %关键块在所有图像块索引阵列中的索引
 par.maxr = par.h - par.ps + 1;
-par.maxc = par.w - par.ps + 1;
+par.maxc = par.w - par.ps + 1;%%划分图像块按照 step 为 1 全部划分
 r          =  1:par.step:par.maxr;
 par.r          =  [r r(end) + 1:par.maxr];
 c          =  1:par.step:par.maxc;
-par.c          =  [c c(end) + 1:par.maxc];
+par.c          =  [c c(end) + 1:par.maxc];%% 去噪过程中仅采用关键图像块，而不是遍历所有划分的图像块
 par.lenr = length(par.r);
 par.lenc = length(par.c);
 par.ps2 = par.ps^2;  %图像块中像素个数
-par.ps2ch = par.ps2 * par.ch;   %图像块三个通道总的像素个数 3p^2
+par.ps2ch = par.ps2 * par.ch;   %三通道图像块总的像素个数 3p^2
 % Total number of patches in the test image
-par.maxrc = par.maxr * par.maxc;
+par.maxrc = par.maxr * par.maxc;%单通道，三通道要乘以 3
 % Total number of seed patches being processed   关键图像块个数
 par.lenrc = par.lenr * par.lenc;
 % index of each patch in image
 par.Index     =   (1:par.maxrc);
-par.Index    =   reshape(par.Index, par.maxr, par.maxc);  %所有划分图像块的索引
-% preset variables for all the patch indexes in the Searching window
+par.Index    =   reshape(par.Index, par.maxr, par.maxc);  %所有划分图像块的索引，从 1 到 maxrc
+% “搜索”窗口中所有补丁索引的预设变量
 par.NeighborIndex    =   int32(zeros(4 * par.win^2, par.lenrc));   
 par.NumIndex        =   int32(zeros(1, par.lenrc));
 par.SelfIndex   =   int32(zeros(1, par.lenrc));
