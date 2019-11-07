@@ -9,8 +9,7 @@ for  i      =  1 : length(Par.SelfIndex) % For each keypatch group
     Y    =   Y-mY;
     X 	=   DWNNM_ADMM( Y,W, Sigma_arr(:, Par.SelfIndex(i)), Par); % DWNNM Estimation   Sigma_arr(:, Par.SelfIndex(i))  one clomn of Sigma
     Y_hat(:,NL_mat(1:Par.nlsp,i))  = Y_hat(:,NL_mat(1:Par.nlsp,i))+X+mY;
-    W_hat(:,NL_mat(1:Par.nlsp,i))     = W_hat(:,NL_mat(1:Par.nlsp,i))+ones(Par.ps2ch, Par.nlsp);
-    fprintf('%d :key patch\n',i);
+    W_hat(:,NL_mat(1:Par.nlsp,i))     = W_hat(:,NL_mat(1:Par.nlsp,i))+ones(Par.ps2, Par.nlsp);
 end
 end
 

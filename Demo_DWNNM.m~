@@ -42,7 +42,7 @@ for i = 1:im_num
     
     randn('seed',0);
     Par.nim(:, :) = Par.I(:, :) + Par.nSig0 * randn(size(Par.I(:, :))); %ÃÌº”‘Î…˘
-    Par.weight(:,:)=local_structure_weight(Par.nim(:, :),'Gaussian',1.2);
+    Par.weight(:,:)=local_structure_weight(Par.nim(:, :),'Gaussian',Par.nSig0);
     
     fprintf('%s denoising process start:\n',imgName);
     PSNR =   csnr( Par.nim, Par.I, 0, 0 );
@@ -59,9 +59,9 @@ for i = 1:im_num
     % calculate the PSNR  SSIM
     Par.PSNR(Par.Iter, Par.imgidx)  =   csnr( im_out, Par.I, 0, 0 );
     Par.SSIM(Par.Iter, Par.imgidx)      =  cal_ssim( im_out, Par.I, 0, 0 );
-    imname = sprintf([Par.method '_nSig' num2str(nSig)  '_Oite' num2str(Par.Iter) '_Iite' num2str(Par.maxIter) '_rho' num2str(Par.rho) '_mu' num2str(Par.mu) '_lambda' num2str(Par.lambda) '_' imgName]);
+    imname = sprintf([Par.method '_nSig' num2str(nSig(1))  '_Oite' num2str(Par.Iter) '_Iite' num2str(Par.maxIter) '_rho' num2str(Par.rho) '_mu' num2str(Par.mu) '_lambda' num2str(Par.lambda) '_' imgName]);
     imwrite(im_out/255, [Denoising_image_dir,imname]);
-    fprintf('%s : PSNR = %2.4f, SSIM = %2.4f \n',imgName, Par.PSNR(Par.Iter, Par.imgidx),Par.SSIM(Par.Iter, Par.imgidx));
+    fprintf('%s : PSNR = %2.4f, SSIM = %2.4f \n',im_dir(i).name, Par.PSNR(Par.Iter, Par.imgidx),Par.SSIM(Par.Iter, Par.imgidx)     );
 end
 mPSNR=mean(Par.PSNR,2);    %mean value of rows
 [~, idx] = max(mPSNR);     %the index of max mean value
@@ -70,5 +70,5 @@ SSIM = Par.SSIM(idx,:);  %SSIM value of max index
 mSSIM=mean(SSIM,2);
 fprintf('The best PSNR result is at %d iteration. \n',idx);
 fprintf('The average PSNR = %2.4f, SSIM = %2.4f. \n', mPSNR(idx),mSSIM);
-name = sprintf([Par.method '_nSig' num2str(nSig) '_Oite' num2str(Par.Iter) '_Iite' num2str(Par.maxIter) '_rho' num2str(Par.rho) '_mu' num2str(Par.mu) '_lambda' num2str(Par.lambda) '.mat']);
+name = sprintf([Par.method '_nSig' num2str(nSig(1)) '_Oite' num2str(Par.Iter) '_Iite' num2str(Par.maxIter) '_rho' num2str(Par.rho) '_mu' num2str(Par.mu) '_lambda' num2str(Par.lambda) '.mat']);
 save(name,'nSig','PSNR','SSIM','mPSNR','mSSIM');

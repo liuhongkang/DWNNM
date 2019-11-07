@@ -1,14 +1,15 @@
 function [E_Img, Par]   =  DWNNM_Denoising( N_Img, O_Img,W_Img, Par )
 E_Img           = N_Img;   % Estimated Image
-[h, w]  = size(E_Img);
+[h, w, ch]  = size(E_Img);
 Par.h = h;
 Par.w = w;
+Par.ch = ch;
 Par = SearchNeighborIndex( Par ); %search the indexes in the neighborhood of key patch
 % noisy image to patch
 NoiPat =	Image2Patch( N_Img, Par );  %noise patches
 WeiPat=Image2Patch(W_Img,Par);  %  weight patches
 Par.TolN = size(NoiPat, 2);   % the number of column    the number of patches
-Sigma_arrCh = zeros(Par.ps2, Par.TolN);
+Sigma_arrCh = zeros(Par.ch*Par.ps2, Par.TolN);
 for iter = 1 : Par.Iter
     Par.iter = iter;
     % iterative regularization
@@ -21,7 +22,7 @@ for iter = 1 : Par.Iter
         TempSigma_arrCh = sqrt(max(0, repmat(Par.nSig0^2, 1, size(CurPat, 2)) - mean((NoiPat(1:Par.ps2, :) - CurPat(1:Par.ps2, :)).^2)));
         
     else
-        TempSigma_arrCh = Par.lambda*sqrt(max(0, repmat(Par.nSig0^2, 1, size(CurPat, 2)) - mean((NoiPat(1:Par.ps2, :) - CurPat(1:Par.ps2, :)).^2)));
+        TempSigma_arrCh = Par.lambda*sqrt(max(0, repmat(Par.nSig0^2, 1, size(CurPat, 2)) - mean((NoiPat(1:c*Par.ps2, :) - CurPat((c-1)*Par.ps2+1:c*Par.ps2, :)).^2)));
         
     end
     Sigma_arrCh(1:Par.ps2, :) = repmat(TempSigma_arrCh, [Par.ps2, 1]);
@@ -36,8 +37,8 @@ for iter = 1 : Par.Iter
     PSNR  = csnr( O_Img, E_Img, 0, 0 );
     SSIM      =  cal_ssim( O_Img, E_Img, 0, 0 );
     fprintf( 'Iter = %2.3f, PSNR = %2.2f, SSIM = %2.2f \n', iter, PSNR, SSIM );
-    Par.PSNR(iter, Par.imgidx)  =   PSNR;
-    Par.SSIM(iter, Par.imgidx)      =  SSIM;
+    Par.PSNR(iter, Par.image)  =   PSNR;
+    Par.SSIM(iter, Par.image)      =  SSIM;
 end
 return;
 

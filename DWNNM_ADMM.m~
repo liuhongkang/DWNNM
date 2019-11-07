@@ -28,15 +28,16 @@ end
 [matrix_row,matrix_col]=size(Y);
 % Initializing optimization variables
 % Intialize the weight matrix W
+mNSig=min(NSig);
 NSig=repmat(NSig,1,matrix_col);%resize to the same size with W_local
-W_n = 1 ./ (NSig+eps);
+W_n = (mNSig+eps) ./ (NSig+eps);
 % Initializing optimization variables
 Z = zeros(size(Y));
 A = zeros(size(Y));
 %% Start main loop
 iter = 0;
 PatNum       = size(Y,2);
-TempC  = Par.Constant * sqrt(PatNum);
+TempC  = Par.Constant * sqrt(PatNum)*mNSig^2;
 while iter < Par.maxIter
     iter = iter + 1;
     
